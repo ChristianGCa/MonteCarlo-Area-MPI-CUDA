@@ -12,7 +12,7 @@
 
 #include "png_loader.h"
 
-__device__ __host__ inline bool is_blue_pixel(unsigned char r, unsigned char g, unsigned char b) {
+__device__ __host__ inline bool is_red_pixel(unsigned char r, unsigned char g, unsigned char b) {
     return (r == 255 && g == 0 && b == 0);
 }
 
@@ -36,7 +36,7 @@ __global__ void monte_kernel(const unsigned char* d_img, int width, int height, 
         unsigned char r = d_img[base + 0];
         unsigned char g = d_img[base + 1];
         unsigned char b = d_img[base + 2];
-        if (is_blue_pixel(r, g, b)) local_count++;
+        if (is_red_pixel(r, g, b)) local_count++;
     }
     atomicAdd(d_count, local_count);
 }
@@ -156,11 +156,11 @@ int main(int argc, char** argv) {
     CUDA_CHECK(cudaGetLastError());
     CUDA_CHECK(cudaDeviceSynchronize());
 
-    unsigned long long local_blue_count = 0;
-    CUDA_CHECK(cudaMemcpy(&local_blue_count, d_count, sizeof(unsigned long long), cudaMemcpyDeviceToHost));
+    unsigned long long local_red_count = 0;
+    CUDA_CHECK(cudaMemcpy(&local_red_count, d_count, sizeof(unsigned long long), cudaMemcpyDeviceToHost));
 
     unsigned long long global_red_count = 0;
-    MPI_Reduce(&local_blue_count, &global_red_count, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&local_red_count, &global_red_count, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
 
     unsigned long long local_samples_done = samples_per_rank;
     unsigned long long global_samples_done = 0;
@@ -170,7 +170,7 @@ int main(int argc, char** argv) {
         double fraction_red = 0.0;
         if (global_samples_done > 0) fraction_red = (double)global_red_count / (double)global_samples_done;
         unsigned long long total_pixels = (unsigned long long)width * (unsigned long long)height;
-        double estimated_blue_pixels = fraction_red * (double)total_pixels;
+        double estimated_red_pixels = fraction_red * (double)total_pixels;
 
         double areaSubArea = fraction_red * areaKm2;
         printf("\n");
