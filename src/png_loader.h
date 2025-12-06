@@ -6,9 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Carrega PNG em RGB, 8 bits por canal.
-// Retorna ponteiro malloc() com buffer tightly-packed: width * height * 3 bytes.
-// Se falhar, retorna NULL.
 unsigned char* load_png_rgb(const char* filename, int* width, int* height)
 {
     FILE* fp = fopen(filename, "rb");
@@ -17,7 +14,6 @@ unsigned char* load_png_rgb(const char* filename, int* width, int* height)
         return NULL;
     }
 
-    // Verifica assinatura PNG (8 bytes)
     unsigned char header[8];
     if (fread(header, 1, 8, fp) != 8) {
         fclose(fp);
@@ -58,14 +54,12 @@ unsigned char* load_png_rgb(const char* filename, int* width, int* height)
     if (bit_depth == 16)
         png_set_strip_16(png_ptr);
 
-    // Convert palette/grayscale to RGB
     if (color_type == PNG_COLOR_TYPE_PALETTE)
         png_set_palette_to_rgb(png_ptr);
 
     if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
         png_set_expand_gray_1_2_4_to_8(png_ptr);
 
-    // Remove alpha if present
     if (color_type & PNG_COLOR_MASK_ALPHA)
         png_set_strip_alpha(png_ptr);
 
@@ -83,7 +77,6 @@ unsigned char* load_png_rgb(const char* filename, int* width, int* height)
         return NULL;
     }
 
-    // Leitura em buffer temporário (pode ter padding)
     unsigned char* tmpbuf = (unsigned char*)malloc((*height) * rowbytes);
     if (!tmpbuf) {
         fprintf(stderr, "Erro: sem memória (tmpbuf).\n");
@@ -98,7 +91,6 @@ unsigned char* load_png_rgb(const char* filename, int* width, int* height)
 
     png_read_image(png_ptr, row_pointers);
 
-    // Agora garanto buffer tightly-packed (width * height * 3)
     const size_t tight_rowbytes = (size_t)(*width) * 3u;
     unsigned char* outbuf = (unsigned char*)malloc((size_t)(*height) * tight_rowbytes);
     if (!outbuf) {
@@ -111,10 +103,8 @@ unsigned char* load_png_rgb(const char* filename, int* width, int* height)
     }
 
     if (rowbytes == tight_rowbytes) {
-        // já está tight
         memcpy(outbuf, tmpbuf, (size_t)(*height) * tight_rowbytes);
     } else {
-        // copiar linha a linha, descartando eventual padding
         for (int y = 0; y < *height; ++y) {
             memcpy(outbuf + (size_t)y * tight_rowbytes, tmpbuf + (size_t)y * rowbytes, tight_rowbytes);
         }
