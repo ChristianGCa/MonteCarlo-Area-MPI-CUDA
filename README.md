@@ -6,7 +6,7 @@ Este projeto implementa um algoritmo de Monte Carlo para estimar a quantidade de
 - Um loader PNG simples (png_loader.h) implementado manualmente
 
 Ademais, o objetivo principal é calcular a área aproximada de lagos, terrenos ou outras formas com muitas imperfeições usando um mapa como imagem de entrada.
-Para isso, obtivemos prints retangulares de áreas do Google Maps e, usando a ferramenta de medição do próprio, desenhamos um polígono retangular para saber a área da região do print.
+Para isso, obtivemos prints retangulares de áreas do Google Earth e, usando a ferramenta de medição do próprio, desenhamos um polígono retangular para saber a área da região do print.
 Desse modo, podemos colorir de vermelho alguma forma no mapa (um lago, por exemplo) usando o Paint (ferramenta do Windows) e usar o algoritmo de Monte Carlo implementado para predizer o tamanho dela.
 
 ## Compilando e executando
