@@ -60,6 +60,8 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
+    double start_time = MPI_Wtime();
+
     if (argc < 4) {
         if (world_rank == 0) {
             fprintf(stderr, "Uso: %s total_samples threads_per_block caminho_imagem.png area_km2\n", argv[0]);
@@ -141,7 +143,6 @@ int main(int argc, char** argv) {
 
     unsigned long long max_threads = (unsigned long long)threads_per_block * 65535ULL;
     unsigned long long threads_needed = samples_per_rank < max_threads ? samples_per_rank : max_threads;
-    // garantir pelo menos 1 thread
     if (threads_needed == 0) threads_needed = 1ULL;
 
     int grid = (int)((threads_needed + threads_per_block - 1ULL) / threads_per_block);
@@ -155,6 +156,7 @@ int main(int argc, char** argv) {
     }
 
     monte_kernel<<<grid, threads_per_block>>>(d_img, width, height, samples_per_rank, seed, d_count);
+
     CUDA_CHECK(cudaGetLastError());
     CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -181,10 +183,14 @@ int main(int argc, char** argv) {
         printf("Área da subárea = %.2f km²\n", areaSubArea);
     }
 
-    // cleanup
     CUDA_CHECK(cudaFree(d_img));
     CUDA_CHECK(cudaFree(d_count));
     free(h_img);
+
+    double end_time = MPI_Wtime();
+    if (world_rank == 0) {
+        printf("\nTempo total de execução (MPI + CUDA): %.6f segundos\n", end_time - start_time);
+    }
 
     MPI_Finalize();
     return 0;

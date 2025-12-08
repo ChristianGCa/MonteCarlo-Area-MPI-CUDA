@@ -19,10 +19,10 @@ int main(int argc, char** argv) {
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+    double start_time = MPI_Wtime();
 
     if (argc < 4) {
         if (rank == 0) {
-
             printf("Uso:\n");
             printf("  mpirun -np N ./monte_mpi total_samples caminho_imagem.png area_km2\n");
             printf("Exemplo:\n");
@@ -42,7 +42,6 @@ int main(int argc, char** argv) {
     unsigned long long samples_per_rank = base + (rank < remainder ? 1ULL : 0ULL);
 
     if (rank == 0) {
-
         printf("argv[0] = %s\n", argv[0]);
         printf("argv[1] = %s\n", argv[1]);
         printf("argv[2] = %s\n", argv[2]);
@@ -113,6 +112,13 @@ int main(int argc, char** argv) {
     }
 
     free(full_img);
+
+    double end_time = MPI_Wtime();
+
+    if (rank == 0) {
+        printf("\nTempo total de execução (MPI): %.6f segundos\n", end_time - start_time);
+    }
+
     MPI_Finalize();
     return 0;
 }
