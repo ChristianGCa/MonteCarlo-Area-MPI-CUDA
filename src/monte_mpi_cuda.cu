@@ -16,7 +16,9 @@ __device__ __host__ inline bool is_red_pixel(unsigned char r, unsigned char g, u
     return (r == 255 && g == 0 && b == 0);
 }
 
-__global__ void monte_kernel(const unsigned char* d_img, int width, int height, unsigned long long samples_per_rank, unsigned long long seed, unsigned long long* d_count) {
+__global__ void monte_kernel(const unsigned char* d_img, int width, int height,
+    unsigned long long samples_per_rank, unsigned long long seed, unsigned long long* d_count) {
+        
     unsigned long long tid = (unsigned long long)blockIdx.x * blockDim.x + threadIdx.x;
     unsigned long long threads_launched = (unsigned long long)gridDim.x * blockDim.x;
     if (tid >= threads_launched) return;
