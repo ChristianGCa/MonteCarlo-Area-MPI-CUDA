@@ -7,7 +7,7 @@ Este projeto implementa um algoritmo de Monte Carlo para estimar a quantidade de
 
 Ademais, o objetivo principal é calcular a área aproximada de lagos, terrenos ou outras formas com muitas imperfeições usando um mapa como imagem de entrada.
 Para isso, obtivemos prints retangulares de áreas do Google Earth e, usando a ferramenta de medição do próprio, desenhamos um polígono retangular para saber a área da região do print.
-Desse modo, podemos colorir de vermelho alguma forma no mapa (um lago, por exemplo) usando o Paint (ferramenta do Windows) e usar o algoritmo de Monte Carlo implementado para predizer o tamanho dela.
+Desse modo, podemos colorir de vermelho alguma forma no mapa (um lago, por exemplo) usando o Paint (ferramenta do Windows) e usar o algoritmo de Monte Carlo implementado para predizer o tamanho dela, levando em conta a área total.
 
 ## Compilando e executando
 
